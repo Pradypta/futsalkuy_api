@@ -2,19 +2,20 @@
 
 $server_key = "SB-Mid-server-SSjskE7OwkP_Clng-UnehDcN";
 
-$ls_production = false
+$is_production = false
 
-$api_url = $ls_production ?
+
+$api_url = $is_production ?
  'https://app.midtrans.com/snap/v1/transactions' : 
  'https://app.sandbox.midtrans.com/snap/v1/transactions';
 
-if(!strpos($_SERVER['REQUEST_URI'], '/charge')){
+if( !strpos($_SERVER['REQUEST_URI'], '/charge')){
     http_response_code(404)
     echo "wrong path, make sure it's '/charge'"; exit();
 }
 if($_SERVER['REQUEST_METHOD'] !== 'POST'){
     http_response_code(404);
-    echo "page not found or wrong HTTP request method is used"; exit()
+    echo "page not found or wrong HTTP request method is used"; exit();
 }
 
 $request_body = file_get_contents('php://input');
