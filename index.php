@@ -1,21 +1,22 @@
 <?php
 
-$server_key = "SB-Mid-server-SSjskE7OwkP_Clng-UnehDcN";
+$server_key = "YOUR_SERVER_KEY";
 
 $is_production = false;
 
+$api_url = $is_production ? 
+  'https://app.midtrans.com/snap/v1/transactions' : 
+  'https://app.sandbox.midtrans.com/snap/v1/transactions';
 
-$api_url = $is_production ?
- 'https://app.midtrans.com/snap/v1/transactions' : 
- 'https://app.sandbox.midtrans.com/snap/v1/transactions';
 
-if( !strpos($_SERVER['REQUEST_URI'], '/charge')){
-    http_response_code(404);
-    echo "wrong path, make sure it's '/charge'"; exit();
+if( !strpos($_SERVER['REQUEST_URI'], '/charge') ) {
+  http_response_code(404); 
+  echo "wrong path, make sure it's `/charge`"; exit();
 }
-if($_SERVER['REQUEST_METHOD'] !== 'POST'){
-    http_response_code(404);
-    echo "page not found or wrong HTTP request method is used"; exit();
+
+if( $_SERVER['REQUEST_METHOD'] !== 'POST'){
+  http_response_code(404);
+  echo "Page not found or wrong HTTP request method is used"; exit();
 }
 
 $request_body = file_get_contents('php://input');
@@ -25,28 +26,29 @@ $charge_result = chargeAPI($api_url, $server_key, $request_body);
 
 http_response_code($charge_result['http_code']);
 
-echo $charge_result['body']
+echo $charge_result['body'];
+
 
 function chargeAPI($api_url, $server_key, $request_body){
-    $curl_options = array(
-        CURLOPT_URL =>$api_url,
-        CURLOPT_RETURNTRANSFER => 1,
-        CURLOPT_POST => 1,
-        CURL_HEADER => 0,
+  $ch = curl_init();
+  $curl_options = array(
+    CURLOPT_URL => $api_url,
+    CURLOPT_RETURNTRANSFER => 1,
+    CURLOPT_POST => 1,
+    CURLOPT_HEADER => 0,
 
-        CURL_HTTPREADER => array(
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'Authoorization: Basic ' . base64_encode($server_key . ':')
-        ),
-        CURLOPT_POSTFIELDS =>$request_body
-    );
-    curl_setopt_array($ch,$curl_options);
-    $result = array(
-        'body' => curl_exec($ch),
-        'http_code' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
-    );
-    return $result;
+
+    CURLOPT_HTTPHEADER => array(
+      'Content-Type: application/json',
+      'Accept: application/json',
+      'Authorization: Basic ' . base64_encode($server_key . ':')
+    ),
+    CURLOPT_POSTFIELDS => $request_body
+  );
+  curl_setopt_array($ch, $curl_options);
+  $result = array(
+    'body' => curl_exec($ch),
+    'http_code' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
+  );
+  return $result;
 }
-
-?>
