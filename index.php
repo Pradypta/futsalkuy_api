@@ -2,7 +2,7 @@
 
 $server_key = "SB-Mid-server-SSjskE7OwkP_Clng-UnehDcN";
 
-$is_production = false
+$is_production = false;
 
 
 $api_url = $is_production ?
